@@ -1,0 +1,33 @@
+services:
+  # Il nostro Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # Porta per la comunicazione dati
+      - "15672:15672" # Porta per la dashboard di controllo
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+
+  # Il nostro Database (Time-series)
+  influxdb:
+    image: influxdb:latest
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=my-user
+      - DOCKER_INFLUXDB_INIT_PASSWORD=my-password123
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=crypto-bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-token
+
+  # Gestore della Dashboard
+  grafana:
+      image: grafana/grafana-oss:latest
+      ports:
+        - "3000:3000"
+      environment:
+        - GF_SECURITY_ADMIN_PASSWORD=admin
+      depends_on:
+        - influxdb
